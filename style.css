@@ -1,0 +1,57 @@
+@layer utilities {
+  .content-auto {
+    content-visibility: auto;
+  }
+  .red-packet-shadow {
+    box-shadow: 0 5px 15px rgba(199, 0, 57, 0.4);
+  }
+  .gold-gradient {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+  }
+  .coin-animation {
+    animation: flyUp 1s ease-out forwards;
+  }
+  .open-animation {
+    animation: openRedPacket 0.8s ease-out forwards;
+  }
+  .result-animation {
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+}
+
+@keyframes flyUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes openRedPacket {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(0) rotate(360deg);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
