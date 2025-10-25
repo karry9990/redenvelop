@@ -64,7 +64,7 @@
               placeholder="请输入红包个数"
             >
           </div>
-          <div class="mb-8">
+          <div class="mb-6">
             <label for="totalAmount" class="block text-left text-gray-700 font-medium mb-2">总金额 (元)</label>
             <input 
               type="number" 
@@ -75,6 +75,38 @@
               value="100"
               placeholder="请输入总金额"
             >
+          </div>
+          <div class="mb-8">
+            <label class="block text-left text-gray-700 font-medium mb-2">红包样式</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label class="relative cursor-pointer">
+                <input type="radio" name="packetStyle" value="normal" class="sr-only" checked>
+                <div class="w-full h-24 bg-red-primary rounded-lg flex items-center justify-center text-white font-medium border-2 border-transparent hover:border-red-primary/50 transition-all">
+                  <i class="fa fa-envelope-o text-2xl mr-2"></i> 普通红包
+                </div>
+                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gold-primary rounded-full hidden radio-indicator"></div>
+              </label>
+              <label class="relative cursor-pointer">
+                <input type="radio" name="packetStyle" value="birthday" class="sr-only">
+                <div class="w-full h-24 bg-gradient-to-r from-pink-500 to-purple-500 rounded-lg flex items-center justify-center text-white font-medium border-2 border-transparent hover:border-pink-500/50 transition-all">
+                  <i class="fa fa-birthday-cake text-2xl mr-2"></i> 生日红包
+                </div>
+                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gold-primary rounded-full hidden radio-indicator"></div>
+              </label>
+              <label class="relative cursor-pointer">
+                <input type="radio" name="packetStyle" value="festival" class="sr-only">
+                <div class="w-full h-24 bg-gradient-to-r from-green-500 to-teal-500 rounded-lg flex items-center justify-center text-white font-medium border-2 border-transparent hover:border-green-500/50 transition-all">
+                  <i class="fa fa-star text-2xl mr-2"></i> 节日红包
+                </div>
+                <div class="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-gold-primary rounded-full hidden radio-indicator"></div>
+              </label>
+            </div>
+            <div class="mt-2">
+              <label class="flex items-center cursor-pointer">
+                <input type="checkbox" id="randomStyle" class="form-checkbox h-5 w-5 text-red-primary rounded">
+                <span class="ml-2 text-gray-600">随机分配样式</span>
+              </label>
+            </div>
           </div>
           <button id="createPacketButton" class="w-full py-3 px-6 bg-red-primary text-white rounded-lg font-medium hover:bg-red-dark transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-primary/50">
             塞钱进红包

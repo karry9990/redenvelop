@@ -7,12 +7,17 @@ let claimedPackets = []; // 记录被领取的红包索引，保持原始顺序
 let startTime = 0;
 let endTime = 0;
 let redPacketHistory = []; // 存储我的红包记录
+let packetStyles = []; // 存储每个红包的样式
+let selectedStyle = 'normal'; // 默认样式
+let isRandomStyle = false; // 是否随机分配样式
 
 // 获取DOM元素
 const initScreen = document.getElementById('initScreen');
 const packetCountInput = document.getElementById('packetCount');
 const totalAmountInput = document.getElementById('totalAmount');
 const createPacketButton = document.getElementById('createPacketButton');
+const packetStyleRadios = document.querySelectorAll('input[name="packetStyle"]');
+const randomStyleCheckbox = document.getElementById('randomStyle');
 const packetListScreen = document.getElementById('packetListScreen');
 const remainingCount = document.getElementById('remainingCount');
 const totalAmountDisplay = document.getElementById('totalAmountDisplay');
@@ -108,15 +113,40 @@ function showPacketList() {
       continue;
     }
     
+    // 获取当前红包样式
+    const style = packetStyles[i];
+    
+    // 根据样式设置不同的类名和文本
+    let packetClass = 'normal-packet';
+    let bottomClass = 'normal-packet-bottom';
+    let shadowClass = 'red-packet-shadow';
+    let packetText = '红包';
+    let iconClass = 'fa-envelope-o';
+    
+    if (style === 'birthday') {
+      packetClass = 'birthday-packet';
+      bottomClass = 'birthday-packet-bottom';
+      shadowClass = 'birthday-packet-shadow';
+      packetText = '生日红包';
+      iconClass = 'fa-birthday-cake';
+    } else if (style === 'festival') {
+      packetClass = 'festival-packet';
+      bottomClass = 'festival-packet-bottom';
+      shadowClass = 'festival-packet-shadow';
+      packetText = '节日红包';
+      iconClass = 'fa-star';
+    }
+    
     const packetElement = document.createElement('div');
     packetElement.className = 'relative aspect-square cursor-pointer hover:scale-105 transition-transform';
     packetElement.innerHTML = `
-      <div class="w-full h-full bg-red-primary rounded-xl red-packet-shadow relative overflow-hidden flex flex-col items-center justify-center">
+      <div class="w-full h-full ${packetClass} rounded-xl ${shadowClass} relative overflow-hidden flex flex-col items-center justify-center">
         <div class="absolute top-1/4 left-0 right-0 h-[1px] bg-gold-primary"></div>
         <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-5 h-5 rounded-full bg-gold-primary"></div>
-        <div class="text-gold-primary text-sm font-bold mt-4 mb-1">红包</div>
+        <i class="fa ${iconClass} text-gold-primary text-sm mb-1"></i>
+        <div class="text-gold-primary text-sm font-bold mt-2 mb-1">${packetText}</div>
         <div class="text-gold-light text-xs">点击领取</div>
-        <div class="absolute bottom-0 left-0 right-0 h-3 bg-red-dark"></div>
+        <div class="absolute bottom-0 left-0 right-0 h-3 ${bottomClass}"></div>
       </div>
     `;
     
@@ -135,6 +165,39 @@ function showPacketList() {
 function openPacketDetail(index) {
   currentPacketIndex = index;
   packetIndex.textContent = `第${index + 1}个`;
+  
+  // 获取当前红包样式
+  const style = packetStyles[index];
+  
+  // 重置红包样式类
+  singleRedPacket.className = '';
+  
+  // 根据样式设置不同的类名
+  let packetClass = 'normal-packet';
+  let shadowClass = 'red-packet-shadow';
+  let bottomClass = 'normal-packet-bottom';
+  
+  if (style === 'birthday') {
+    packetClass = 'birthday-packet';
+    shadowClass = 'birthday-packet-shadow';
+    bottomClass = 'birthday-packet-bottom';
+  } else if (style === 'festival') {
+    packetClass = 'festival-packet';
+    shadowClass = 'festival-packet-shadow';
+    bottomClass = 'festival-packet-bottom';
+  }
+  
+  // 设置红包样式
+  singleRedPacket.className = `${packetClass} w-full h-full rounded-2xl ${shadowClass} relative overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95`;
+  
+  // 重新设置红包内容
+  singleRedPacket.innerHTML = `
+    <div class="absolute top-1/4 left-0 right-0 h-1 bg-gold-primary"></div>
+    <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-gold-primary"></div>
+    <div class="text-gold-primary text-[clamp(2rem,6vw,3rem)] font-bold mt-8 mb-2">开</div>
+    <div id="packetIndex" class="text-gold-light text-sm">第${index + 1}个</div>
+    <div class="absolute bottom-0 left-0 right-0 h-6 ${bottomClass}"></div>
+  `;
   
   // 重置红包状态
   singleRedPacket.classList.remove('open-animation');
@@ -306,6 +369,7 @@ function restartGame() {
   // 重置变量
   packets = [];
   claimedPackets = []; // 重置已领取红包记录
+  packetStyles = []; // 重置红包样式
   currentPacketIndex = -1;
   // 红包记录不清空，保持历史记录
 }
@@ -314,6 +378,16 @@ function restartGame() {
 function initPackets() {
   packetCount = parseInt(packetCountInput.value);
   totalAmount = parseFloat(totalAmountInput.value);
+  
+  // 获取选择的样式
+  packetStyleRadios.forEach(radio => {
+    if (radio.checked) {
+      selectedStyle = radio.value;
+    }
+  });
+  
+  // 获取随机分配设置
+  isRandomStyle = randomStyleCheckbox.checked;
   
   // 验证输入
   if (isNaN(packetCount) || packetCount < 1 || packetCount > 100) {
@@ -329,6 +403,21 @@ function initPackets() {
   // 生成红包金额
   packets = generatePackets(packetCount, totalAmount);
   claimedPackets = [];
+  
+  // 生成红包样式
+  packetStyles = [];
+  const styleOptions = ['normal', 'birthday', 'festival'];
+  
+  for (let i = 0; i < packetCount; i++) {
+    if (isRandomStyle) {
+      // 随机选择样式
+      const randomIndex = Math.floor(Math.random() * styleOptions.length);
+      packetStyles.push(styleOptions[randomIndex]);
+    } else {
+      // 使用统一样式
+      packetStyles.push(selectedStyle);
+    }
+  }
   
   // 切换到红包列表页面
   initScreen.classList.add('hidden');

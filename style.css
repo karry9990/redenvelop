@@ -17,6 +17,42 @@
   .result-animation {
     animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   }
+  /* 红包样式相关 */
+  .normal-packet {
+    background: #E63946;
+  }
+  .normal-packet-bottom {
+    background: #C70039;
+  }
+  .birthday-packet {
+    background: linear-gradient(135deg, #FF6B9B 0%, #9C27B0 100%);
+  }
+  .birthday-packet-bottom {
+    background: #673AB7;
+  }
+  .festival-packet {
+    background: linear-gradient(135deg, #4CAF50 0%, #009688 100%);
+  }
+  .festival-packet-bottom {
+    background: #2E7D32;
+  }
+  /* 阴影效果 */
+  .birthday-packet-shadow {
+    box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4);
+  }
+  .festival-packet-shadow {
+    box-shadow: 0 5px 15px rgba(0, 150, 136, 0.4);
+  }
+}
+
+/* 单选按钮样式 */
+input[name="packetStyle"]:checked + div {
+  border-color: #FFD700;
+  transform: scale(0.95);
+}
+
+input[name="packetStyle"]:checked + div + .radio-indicator {
+  display: block;
 }
 
 @keyframes flyUp {
