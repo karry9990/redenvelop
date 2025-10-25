@@ -6,6 +6,7 @@ let packets = [];
 let claimedPackets = []; // 记录被领取的红包索引，保持原始顺序
 let startTime = 0;
 let endTime = 0;
+let redPacketHistory = []; // 存储我的红包记录
 
 // 获取DOM元素
 const initScreen = document.getElementById('initScreen');
@@ -30,6 +31,9 @@ const amountList = document.getElementById('amountList');
 const bestAmount = document.getElementById('bestAmount');
 const worstAmount = document.getElementById('worstAmount');
 const restartButton = document.getElementById('restartButton');
+// 红包记录相关DOM元素
+const myRedPacketHistory = document.getElementById('myRedPacketHistory');
+const mobileRedPacketHistory = document.getElementById('mobileRedPacketHistory');
 
 // 当前选中的红包索引
 let currentPacketIndex = -1;
@@ -142,6 +146,48 @@ function openPacketDetail(index) {
   packetDetailScreen.classList.remove('hidden');
 }
 
+// 添加红包记录到界面
+function addRedPacketRecord(amount, timestamp) {
+  // 添加到记录数组
+  redPacketHistory.unshift({ amount, timestamp });
+  
+  // 格式化时间戳
+  const date = new Date(timestamp);
+  const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+  
+  // 创建记录项
+  const recordItem = document.createElement('div');
+  recordItem.className = 'flex justify-between items-center p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors';
+  recordItem.innerHTML = `
+    <div class="text-sm text-gray-600">${formattedTime}</div>
+    <div class="font-bold text-red-primary">+¥${amount.toFixed(2)}</div>
+  `;
+  
+  // 为桌面端添加记录
+  if (myRedPacketHistory.firstChild && myRedPacketHistory.firstChild.textContent.includes('暂无红包记录')) {
+    myRedPacketHistory.innerHTML = '';
+  }
+  myRedPacketHistory.insertBefore(recordItem, myRedPacketHistory.firstChild);
+  
+  // 为移动端创建记录项（使用更简洁的样式）
+  const mobileRecordItem = document.createElement('div');
+  mobileRecordItem.className = 'flex justify-between items-center text-sm p-1.5 bg-gray-50 rounded-lg';
+  mobileRecordItem.innerHTML = `
+    <div class="text-gray-600">${formattedTime}</div>
+    <div class="font-bold text-red-primary">+¥${amount.toFixed(2)}</div>
+  `;
+  
+  // 为移动端添加记录
+  if (mobileRedPacketHistory.firstChild && mobileRedPacketHistory.firstChild.textContent.includes('暂无记录')) {
+    mobileRedPacketHistory.innerHTML = '';
+  }
+  mobileRedPacketHistory.insertBefore(mobileRecordItem, mobileRedPacketHistory.firstChild);
+  
+  // 添加动画效果
+  recordItem.classList.add('result-animation');
+  mobileRecordItem.classList.add('result-animation');
+}
+
 // 拆红包流程
 function claimPacket() {
   // 防止重复点击
@@ -164,6 +210,9 @@ function claimPacket() {
     
     // 记录被领取的红包索引
     claimedPackets.push(currentPacketIndex);
+    
+    // 添加到红包记录
+    addRedPacketRecord(amount, Date.now());
     
     // 检查是否是第一次领取
     if (claimedPackets.length === 1) {
@@ -258,6 +307,7 @@ function restartGame() {
   packets = [];
   claimedPackets = []; // 重置已领取红包记录
   currentPacketIndex = -1;
+  // 红包记录不清空，保持历史记录
 }
 
 // 初始化红包
