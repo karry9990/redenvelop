@@ -43,46 +43,131 @@
     <div class="absolute bottom-0 left-1/4 w-52 h-52 bg-red-light/10 rounded-full blur-3xl"></div>
   </div>
 
-  <div class="relative z-10 text-center">
+  <div class="relative z-10 text-center w-full max-w-lg mx-auto">
     <h1 class="text-[clamp(1.8rem,5vw,2.5rem)] font-bold text-red-dark mb-8 tracking-wide">
       抢红包啦！
     </h1>
-    
-    <!-- 红包容器 -->
-    <div id="redPacketContainer" class="relative w-[clamp(180px,50vw,280px)] h-[clamp(220px,60vw,320px)] mx-auto cursor-pointer">
-      <!-- 红包元素 -->
-      <div id="redPacket" class="w-full h-full bg-red-primary rounded-2xl red-packet-shadow relative overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
-        <!-- 红包装饰 -->
-        <div class="absolute top-1/4 left-0 right-0 h-1 bg-gold-primary"></div>
-        <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-gold-primary"></div>
-        
-        <!-- 红包文字 -->
-        <div class="text-gold-primary text-[clamp(1.5rem,4vw,2.2rem)] font-bold mt-8 mb-2">
-          红包
-        </div>
-        <div class="text-gold-light text-sm animate-pulse">点击拆开</div>
-        
-        <!-- 底部装饰 -->
-        <div class="absolute bottom-0 left-0 right-0 h-6 bg-red-dark"></div>
+
+    <!-- 初始化界面 -->
+    <div id="initScreen" class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+      <div class="mb-6">
+        <label for="packetCount" class="block text-left text-gray-700 font-medium mb-2">红包个数</label>
+        <input 
+          type="number" 
+          id="packetCount" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-primary/50 focus:border-transparent"
+          min="1" 
+          max="100" 
+          value="5"
+          placeholder="请输入红包个数"
+        >
+      </div>
+      <div class="mb-8">
+        <label for="totalAmount" class="block text-left text-gray-700 font-medium mb-2">总金额 (元)</label>
+        <input 
+          type="number" 
+          id="totalAmount" 
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-primary/50 focus:border-transparent"
+          min="0.01" 
+          step="0.01" 
+          value="100"
+          placeholder="请输入总金额"
+        >
+      </div>
+      <button id="createPacketButton" class="w-full py-3 px-6 bg-red-primary text-white rounded-lg font-medium hover:bg-red-dark transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-primary/50">
+        塞钱进红包
+      </button>
+    </div>
+
+    <!-- 红包列表界面（初始隐藏） -->
+    <div id="packetListScreen" class="hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-bold text-gray-800">
+          <span id="remainingCount">0</span>个红包待领取
+        </h2>
+        <span id="totalAmountDisplay" class="text-lg font-bold text-red-primary">¥0.00</span>
       </div>
       
-      <!-- 金币元素（初始隐藏） -->
-      <div id="coins" class="absolute inset-0 pointer-events-none hidden">
-        <!-- 金币会通过JS动态生成 -->
+      <!-- 红包网格 -->
+      <div id="redPacketGrid" class="grid grid-cols-3 gap-4 mb-8">
+        <!-- 红包会通过JS动态生成 -->
       </div>
     </div>
     
-    <!-- 结果弹窗（初始隐藏） -->
-    <div id="resultModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+    <!-- 单个红包详情界面（初始隐藏） -->
+    <div id="packetDetailScreen" class="hidden">
+      <button id="backButton" class="absolute top-0 left-0 text-gray-600 hover:text-gray-900 mb-4">
+        <i class="fa fa-arrow-left mr-1"></i> 返回
+      </button>
+      <h2 class="text-xl font-bold text-gray-800 mb-6">拆红包</h2>
+      
+      <!-- 红包容器 -->
+      <div id="singleRedPacketContainer" class="relative w-[clamp(180px,50vw,280px)] h-[clamp(220px,60vw,320px)] mx-auto">
+        <!-- 红包元素 -->
+        <div id="singleRedPacket" class="w-full h-full bg-red-primary rounded-2xl red-packet-shadow relative overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95">
+          <!-- 红包装饰 -->
+          <div class="absolute top-1/4 left-0 right-0 h-1 bg-gold-primary"></div>
+          <div class="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-8 h-8 rounded-full bg-gold-primary"></div>
+          
+          <!-- 红包文字 -->
+          <div class="text-gold-primary text-[clamp(2rem,6vw,3rem)] font-bold mt-8 mb-2">
+            开
+          </div>
+          <div id="packetIndex" class="text-gold-light text-sm"></div>
+          
+          <!-- 底部装饰 -->
+          <div class="absolute bottom-0 left-0 right-0 h-6 bg-red-dark"></div>
+        </div>
+        
+        <!-- 金币元素（初始隐藏） -->
+        <div id="singleCoins" class="absolute inset-0 pointer-events-none hidden">
+          <!-- 金币会通过JS动态生成 -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- 单个红包结果弹窗（初始隐藏） -->
+    <div id="singleResultModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
       <div class="bg-white rounded-2xl p-8 max-w-md w-full result-animation">
         <div class="text-5xl text-gold-primary mb-4">
           <i class="fa fa-trophy"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800 mb-2">恭喜您！</h2>
         <p class="text-gray-600 mb-6">抢到了红包金额：</p>
-        <div id="amountDisplay" class="text-4xl font-bold text-red-primary mb-8">¥0.00</div>
-        <button id="resetButton" class="w-full py-3 px-6 bg-red-primary text-white rounded-lg font-medium hover:bg-red-dark transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-primary/50">
-          再来一个
+        <div id="singleAmountDisplay" class="text-4xl font-bold text-red-primary mb-8">¥0.00</div>
+        <button id="continueButton" class="w-full py-3 px-6 bg-red-primary text-white rounded-lg font-medium hover:bg-red-dark transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-primary/50">
+          继续
+        </button>
+      </div>
+    </div>
+
+    <!-- 统计结果弹窗（初始隐藏） -->
+    <div id="statsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 hidden">
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full max-h-[80vh] overflow-y-auto result-animation">
+        <div class="text-5xl text-gold-primary mb-4">
+          <i class="fa fa-bar-chart"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">红包抢完啦！</h2>
+        <p id="statsSummary" class="text-gray-600 mb-6">共5个红包，总计¥100.00，0秒被抢完</p>
+        
+        <h3 class="text-lg font-bold text-gray-800 mb-3">红包明细</h3>
+        <div id="amountList" class="space-y-3 mb-8">
+          <!-- 金额列表会通过JS动态生成 -->
+        </div>
+        
+        <div class="flex justify-between items-center mb-8">
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-1">手气最佳</div>
+            <div id="bestAmount" class="text-xl font-bold text-red-primary">¥0.00</div>
+          </div>
+          <div class="text-center">
+            <div class="text-sm text-gray-600 mb-1">运气最差</div>
+            <div id="worstAmount" class="text-xl font-bold text-red-primary">¥0.00</div>
+          </div>
+        </div>
+        
+        <button id="restartButton" class="w-full py-3 px-6 bg-red-primary text-white rounded-lg font-medium hover:bg-red-dark transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-primary/50">
+          再来一轮
         </button>
       </div>
     </div>
